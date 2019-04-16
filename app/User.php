@@ -34,4 +34,8 @@ class User extends Authenticatable
     public function inventory(){
         return $this->hasMany('App\Product');
     }
+
+    public function transactions(){
+        return $this->hasMany('App\Transaction');
+    }
 }

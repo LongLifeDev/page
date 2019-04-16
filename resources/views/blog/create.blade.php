@@ -8,11 +8,18 @@
             {{Form::text('title', '', ['class' => 'form-control', 'placeholder' => 'Title'])}}
         </div>
         <div class="form-group">
+            {{Form::label('title_description', 'Title Description')}}
+            {{Form::text('title_description', '', ['class' => 'form-control', 'placeholder' => 'Title Description'])}}
+        </div>
+        <div class="form-group">
             {{Form::label('body', 'Body')}}
             {{Form::textarea('body', '', ['id' => 'article-ckeditor', 'class' => 'form-control', 'placeholder' => 'Body Text'])}}
         </div>
         <div class="form-group">
             {{Form::file('cover_image')}}
+        </div>
+        <div class="form-group">
+            {{Form::file('secondary_image')}}
         </div>
         {{Form::submit('submit', ['class' => 'btn btn-primary'])}}
     {!! Form::close() !!}

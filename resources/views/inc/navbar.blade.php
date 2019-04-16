@@ -12,7 +12,7 @@
 
                 <!-- Branding Image -->
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'LongLifeMicro') }}
+                    <span class="glyphicon glyphicon-leaf" style="font-size:1em;color:green"></span><b>{{ config('app.name', 'LongLifeMicro') }}</b>
                 </a>
             </div>
 
@@ -34,9 +34,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/store">Store </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Coming Soon! </a>
-                    </li>
+                    
                 </ul> 
 
                 <!-- Right Side Of Navbar -->

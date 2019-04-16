@@ -26,8 +26,22 @@ class StoreController extends Controller
      */
     public function index()
     {
-        $daily = Product::where('is_feature', 1)->take(3)->get();
-        $products = Product::orderBy('created_at', 'desc')->paginate(6);
+        try {
+            // Validate the value...
+            $daily = Product::where('is_feature', 1)->take(3)->get();
+        } catch (Exception $e) {
+            report($e);
+            $daily = null;
+        }
+
+        try {
+            // Validate the value...
+            $products = Product::orderBy('created_at', 'desc')->paginate(6);
+        } catch (Exception $e) {
+            report($e);
+            $products = null;
+        }
+        
         //return view('store.index')->with('products', $products);
         return view('store.index', compact(['daily', 'products']));
     }
@@ -37,11 +51,6 @@ class StoreController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function test()
-    {
-        return view('store.test');
-    }
-    
     
      public function create()
     {
@@ -72,7 +81,6 @@ class StoreController extends Controller
         return back()->with('success', '1 item added to shopping cart');
         //die dump
         //dd($request->session()->get('cart'));
-        //return redirect('/posts')->with('success', 'Post Updated');
     }
 
     public function removeItem($id)
@@ -94,48 +102,46 @@ class StoreController extends Controller
 
     public function getCart()
     {
-        if(!Session::has('cart')) {
-            return view('store.cart', ['products' => null]);
-        } else {
-            $existingCart = Session::get('cart');
-            $cart = new Cart($existingCart);
-            return view('store.cart', ['products' => $cart->items, 'totalPrice' => $cart->totalPrice]);
+        try {
+            // Validate the value...
+            if(!Session::has('cart')) {
+                return view('store.cart', ['products' => null]);
+            } else {
+                $existingCart = Session::get('cart');
+                $cart = new Cart($existingCart);
+                return view('store.cart', ['products' => $cart->items, 'totalPrice' => $cart->totalPrice]);
+            }
+        } catch (Exception $e) {
+            report($e);
+            return redirect('store')->with('error', 'There is an error with Cart.');
         }
+        
     }
 
     public function getCheckout()
     {
-        if(!Session::has('cart')) {
-            return back()->with('success', 'ShoppingCart Empty!');
-        } else {
-            $existingCart = Session::get('cart');
-            $cart = new Cart($existingCart);
-            $total = ($cart->totalPrice * 100);
-            
-            return view('/store/checkout', ['products' => $cart->items, 'total' => $total]);
+        try {
+            // Validate the value...
+            if(!Session::has('cart')) {
+                return back()->with('success', 'ShoppingCart Empty!');
+            } else {
+                $existingCart = Session::get('cart');
+                $cart = new Cart($existingCart);
+                $total = ($cart->totalPrice * 100);
+                }
+        } catch (Exception $e) {
+            report($e);
+            return redirect('store')->with('error', 'There is an error with checkout');
         }
+
+        //view for stripe checkout
+        //return view('/store/checkout', ['products' => $cart->items, 'total' => $total]);
+
+        //view for stripe elements
+        return view('/store/elements', ['products' => $cart->items, 'total' => $total]);
+
     }
-
-    public function getCharge($total)
-    {
-        require_once('./stripeconfig.php');
-
-        $token  = $_POST['stripeToken'];
-        $email  = $_POST['stripeEmail'];
-
-         $customer = \Stripe\Customer::create([
-            'email' => $email,
-            'source'  => $token,
-        ]);
-
-        $charge = \Stripe\Charge::create([
-            'customer' => $customer->id,
-            'amount'   => $total,
-            'currency' => 'usd',
-        ]);
-        Session::forget('cart');
-        return redirect('store')->with('success', 'you have successfully charged '.$total.' to your credit card.');
-    } 
+    
 
     /**
      * Display the specified resource.
@@ -145,9 +151,17 @@ class StoreController extends Controller
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        try {
+            // Validate the value...
+            $product = Product::find($id);
+        } catch (Exception $e) {
+            report($e);
+            return redirect('store')->with('error', 'Could not find that item');
+        }
+
         return view('store.show')->with('product', $product);
     }
+        
 
     /**
      * Show the form for editing the specified resource.
@@ -182,4 +196,6 @@ class StoreController extends Controller
     {
         //
     }
+
+    
 }

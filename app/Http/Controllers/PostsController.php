@@ -50,8 +50,10 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
+            'title_description' => 'required',
             'body' => 'required',
-            'cover_image' => 'image|nullable|max:1999'
+            'cover_image' => 'image|nullable|max:1999',
+            'secondary_image' => 'image|nullable|max:1999'
         ]);
 
         //handle File Upload
@@ -71,12 +73,30 @@ class PostsController extends Controller
             $fileNameToStore = 'noimage.jpg';
         }
 
+        if($request->hasFile('secondary_image')){
+            //Get filename with the extension
+            $filenameWithExt2 = $request -> file('secondary_image')->getClientOriginalName();    
+            //Get just filename
+            $filename2 = pathinfo($filenameWithExt2, PATHINFO_FILENAME);
+            //Get just ext
+            $extension2 = $request->file('secondary_image')->getClientOriginalExtension();
+            //Filename to store
+            $fileNameToStore2 = $filename2.'_'.time().'.'.$extension2;
+            //Upload Image
+            $path2 = $request->file('secondary_image')->storeAs('public/cover_images', $fileNameToStore2);
+            
+        } else {
+            $fileNameToStore2 = 'noimage.jpg';
+        }
+
         //Create post using Tinker
         $post = new Post;
         $post->title = $request->input('title');
+        $post->title_description = $request->input('title_description');
         $post->body = $request->input('body');
         $post->user_id = auth()->user()->id;
         $post->cover_image = $fileNameToStore;
+        $post->secondary_image = $fileNameToStore2;
         $post->save();
 
         // redirect with success message
@@ -106,11 +126,9 @@ class PostsController extends Controller
         $post = Post::find($id);
 
         //Check for correct user
-    
         if(Auth::user()->id !==$post->user_id){
-            return redirect('/posts')->with('error', 'unauthorized Page');
+           return redirect('/posts')->with('error', 'unauthorized Page');
         }
-        
 
         return view('/blog/edit')->with('post', $post);
     } 
@@ -139,8 +157,10 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'title' => 'required',
+            'title_description' => 'required',
             'body' => 'required',
-            'cover_image' => 'image|nullable|max:1999'
+            'cover_image' => 'image|nullable|max:1999',
+            'secondary_image' => 'image|nullable|max:1999'
         ]);
         
         //handle File Upload
@@ -158,12 +178,30 @@ class PostsController extends Controller
             
         }
 
+        if($request->hasFile('secondary_image')){
+            //Get filename with the extension
+            $filenameWithExt2 = $request -> file('secondary_image')->getClientOriginalName();    
+            //Get just filename
+            $filename2 = pathinfo($filenameWithExt2, PATHINFO_FILENAME);
+            //Get just ext
+            $extension2 = $request->file('secondary_image')->getClientOriginalExtension();
+            //Filename to store
+            $fileNameToStore2 = $filename2.'_'.time().'.'.$extension2;
+            //Upload Image
+            $path2 = $request->file('secondary_image')->storeAs('public/cover_images', $fileNameToStore);
+            
+        }
+
         // create post using Tinker
         $post = Post::find($id);
         $post->title = $request->input('title');
+        $post->title_description = $request->input('title_description');
         $post->body = $request->input('body');
         if($request->hasFile('cover_image')){
             $post->cover_image = $fileNameToStore;
+        }
+        if($request->hasFile('secondary_image')){
+            $post->secondary_image = $fileNameToStor2e;
         }
         $post->save();
 

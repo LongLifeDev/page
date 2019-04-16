@@ -135,7 +135,11 @@ class InventoryController extends Controller
         $product = Product::find($id);
 
         //Check for correct user
+        if(!Auth::guest()){
         if(Auth::user()->status < 3){
+            return redirect('/store')->with('error', 'unauthorized Page');
+        }
+        } else {
             return redirect('/store')->with('error', 'unauthorized Page');
         }
 
@@ -237,8 +241,8 @@ class InventoryController extends Controller
         $product = Product::find($id);
         
         //Check for correct user
-        if(Auth::user()->id !==$product->user_id){
-            return redirect('/')->with('error', 'Unauthorized Page');
+        if(Auth::user()->status < 3){
+            return redirect('/')->with('error', 'Unauthorized Action');
         }
 
         if($product->product_image_main != 'noimage.jpg'){
